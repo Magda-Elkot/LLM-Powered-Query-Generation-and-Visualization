@@ -1,0 +1,234 @@
+{
+  "database": "telecom_dw",
+  "dialect": "postgresql",
+  "tables": [
+    {
+      "table_name": "dim_sales_channel",
+      "primary_key": "sales_channel_key",
+      "columns": [
+        { "name": "sales_channel_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "sales_channel_id", "data_type": "TEXT", "nullable": false },
+        { "name": "channel_name", "data_type": "TEXT", "nullable": false },
+        { "name": "channel_type", "data_type": "TEXT", "nullable": false },
+        { "name": "description", "data_type": "TEXT", "nullable": false },
+        { "name": "status", "data_type": "TEXT", "nullable": false }
+      ],
+      "foreign_keys": []
+    },
+    {
+      "table_name": "dim_device",
+      "primary_key": "device_key",
+      "columns": [
+        { "name": "device_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "device_id", "data_type": "TEXT", "nullable": false },
+        { "name": "device_type", "data_type": "TEXT", "nullable": false },
+        { "name": "brand", "data_type": "TEXT", "nullable": false },
+        { "name": "model", "data_type": "TEXT", "nullable": false },
+        { "name": "specifications", "data_type": "TEXT", "nullable": false },
+        { "name": "purchase_date", "data_type": "DATE", "nullable": false },
+        { "name": "status", "data_type": "TEXT", "nullable": false }
+      ],
+      "foreign_keys": []
+    },
+    {
+      "table_name": "dim_product",
+      "primary_key": "product_key",
+      "columns": [
+        { "name": "product_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "product_id", "data_type": "TEXT", "nullable": false },
+        { "name": "product_name", "data_type": "TEXT", "nullable": false },
+        { "name": "category", "data_type": "TEXT", "nullable": false },
+        { "name": "description", "data_type": "TEXT", "nullable": false },
+        { "name": "price", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "launch_date", "data_type": "DATE", "nullable": false },
+        { "name": "discontinue_date", "data_type": "DATE", "nullable": true },
+        { "name": "status", "data_type": "TEXT", "nullable": false }
+      ],
+      "foreign_keys": []
+    },
+    {
+      "table_name": "dim_network",
+      "primary_key": "network_key",
+      "columns": [
+        { "name": "network_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "network_id", "data_type": "TEXT", "nullable": false },
+        { "name": "network_type", "data_type": "TEXT", "nullable": false },
+        { "name": "provider", "data_type": "TEXT", "nullable": false },
+        { "name": "coverage_area", "data_type": "TEXT", "nullable": false },
+        { "name": "performance_metrics", "data_type": "TEXT", "nullable": false },
+        { "name": "launch_date", "data_type": "DATE", "nullable": false },
+        { "name": "status", "data_type": "TEXT", "nullable": false }
+      ],
+      "foreign_keys": []
+    },
+    {
+      "table_name": "dim_geography",
+      "primary_key": "geography_key",
+      "columns": [
+        { "name": "geography_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "geography_id", "data_type": "TEXT", "nullable": false },
+        { "name": "country", "data_type": "TEXT", "nullable": false },
+        { "name": "state", "data_type": "TEXT", "nullable": false },
+        { "name": "city", "data_type": "TEXT", "nullable": false },
+        { "name": "region", "data_type": "TEXT", "nullable": false },
+        { "name": "postal_code", "data_type": "INTEGER", "nullable": false },
+        { "name": "latitude", "data_type": "NUMERIC(9,6)", "nullable": false },
+        { "name": "longitude", "data_type": "NUMERIC(9,6)", "nullable": false }
+      ],
+      "foreign_keys": []
+    },
+    {
+      "table_name": "dim_time",
+      "primary_key": "time_key",
+      "columns": [
+        { "name": "time_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "date", "data_type": "DATE", "nullable": false },
+        { "name": "day", "data_type": "INTEGER", "nullable": false },
+        { "name": "month", "data_type": "INTEGER", "nullable": false },
+        { "name": "month_name", "data_type": "TEXT", "nullable": false },
+        { "name": "quarter", "data_type": "INTEGER", "nullable": false },
+        { "name": "year", "data_type": "INTEGER", "nullable": false },
+        { "name": "week", "data_type": "INTEGER", "nullable": false },
+        { "name": "day_of_week", "data_type": "TEXT", "nullable": false },
+        { "name": "is_weekend", "data_type": "BOOLEAN", "nullable": false },
+        { "name": "fiscal_period", "data_type": "TEXT", "nullable": false },
+        { "name": "holiday_flag", "data_type": "BOOLEAN", "nullable": false }
+      ],
+      "foreign_keys": []
+    },
+    {
+      "table_name": "dim_subscriber",
+      "primary_key": "subscriber_key",
+      "columns": [
+        { "name": "subscriber_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "subscriber_id", "data_type": "TEXT", "nullable": false },
+        { "name": "first_name", "data_type": "TEXT", "nullable": false },
+        { "name": "last_name", "data_type": "TEXT", "nullable": false },
+        { "name": "email", "data_type": "TEXT", "nullable": false },
+        { "name": "phone_number", "data_type": "TEXT", "nullable": false },
+        { "name": "subscription_date", "data_type": "DATE", "nullable": false },
+        { "name": "status", "data_type": "TEXT", "nullable": false },
+        { "name": "gender", "data_type": "TEXT", "nullable": false },
+        { "name": "date_of_birth", "data_type": "DATE", "nullable": false },
+        { "name": "address", "data_type": "TEXT", "nullable": false },
+        { "name": "city", "data_type": "TEXT", "nullable": false },
+        { "name": "state", "data_type": "TEXT", "nullable": false },
+        { "name": "postal_code", "data_type": "INTEGER", "nullable": false },
+        { "name": "country", "data_type": "TEXT", "nullable": false },
+        { "name": "sales_channel_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "device_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "product_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "network_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "geography_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "time_key", "data_type": "INTEGER", "nullable": false }
+      ],
+      "foreign_keys": [
+        { "column": "sales_channel_key", "ref_table": "dim_sales_channel", "ref_column": "sales_channel_key" },
+        { "column": "device_key", "ref_table": "dim_device", "ref_column": "device_key" },
+        { "column": "product_key", "ref_table": "dim_product", "ref_column": "product_key" },
+        { "column": "network_key", "ref_table": "dim_network", "ref_column": "network_key" },
+        { "column": "geography_key", "ref_table": "dim_geography", "ref_column": "geography_key" },
+        { "column": "time_key", "ref_table": "dim_time", "ref_column": "time_key" }
+      ]
+    },
+    {
+      "table_name": "fact_usage",
+      "primary_key": "usage_key",
+      "columns": [
+        { "name": "usage_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "subscriber_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "time_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "product_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "device_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "network_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "geography_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "sales_channel_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "data_consumed_mb", "data_type": "INTEGER", "nullable": false },
+        { "name": "call_minutes", "data_type": "INTEGER", "nullable": false },
+        { "name": "sms_count", "data_type": "INTEGER", "nullable": false },
+        { "name": "roaming_minutes", "data_type": "INTEGER", "nullable": false },
+        { "name": "roaming_data_mb", "data_type": "INTEGER", "nullable": false },
+        { "name": "international_calls", "data_type": "INTEGER", "nullable": false },
+        { "name": "usage_date", "data_type": "DATE", "nullable": false },
+        { "name": "usage_time", "data_type": "TIME", "nullable": false },
+        { "name": "total_usage_cost", "data_type": "NUMERIC(12,2)", "nullable": false }
+      ],
+      "foreign_keys": [
+        { "column": "subscriber_key", "ref_table": "dim_subscriber", "ref_column": "subscriber_key" },
+        { "column": "time_key", "ref_table": "dim_time", "ref_column": "time_key" },
+        { "column": "product_key", "ref_table": "dim_product", "ref_column": "product_key" },
+        { "column": "device_key", "ref_table": "dim_device", "ref_column": "device_key" },
+        { "column": "network_key", "ref_table": "dim_network", "ref_column": "network_key" },
+        { "column": "geography_key", "ref_table": "dim_geography", "ref_column": "geography_key" },
+        { "column": "sales_channel_key", "ref_table": "dim_sales_channel", "ref_column": "sales_channel_key" }
+      ]
+    },
+    {
+      "table_name": "fact_billing",
+      "primary_key": "billing_key",
+      "columns": [
+        { "name": "billing_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "subscriber_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "time_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "invoice_number", "data_type": "TEXT", "nullable": false },
+        { "name": "billing_cycle", "data_type": "TEXT", "nullable": false },
+        { "name": "total_charges", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "discounts", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "taxes", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "total_due", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "due_date", "data_type": "DATE", "nullable": false },
+        { "name": "paid_date", "data_type": "DATE", "nullable": false },
+        { "name": "status", "data_type": "TEXT", "nullable": false },
+        { "name": "payment_method", "data_type": "TEXT", "nullable": false },
+        { "name": "notes", "data_type": "TEXT", "nullable": false }
+      ],
+      "foreign_keys": [
+        { "column": "subscriber_key", "ref_table": "dim_subscriber", "ref_column": "subscriber_key" },
+        { "column": "time_key", "ref_table": "dim_time", "ref_column": "time_key" }
+      ]
+    },
+    {
+      "table_name": "fact_payment",
+      "primary_key": "payment_key",
+      "columns": [
+        { "name": "payment_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "subscriber_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "time_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "payment_id", "data_type": "TEXT", "nullable": false },
+        { "name": "invoice_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "payment_amount", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "payment_method", "data_type": "TEXT", "nullable": false },
+        { "name": "payment_status", "data_type": "TEXT", "nullable": false },
+        { "name": "transaction_reference", "data_type": "TEXT", "nullable": false },
+        { "name": "payment_notes", "data_type": "TEXT", "nullable": false }
+      ],
+      "foreign_keys": [
+        { "column": "subscriber_key", "ref_table": "dim_subscriber", "ref_column": "subscriber_key" },
+        { "column": "time_key", "ref_table": "dim_time", "ref_column": "time_key" },
+        { "column": "invoice_key", "ref_table": "fact_billing", "ref_column": "billing_key" }
+      ]
+    },
+    {
+      "table_name": "fact_churn",
+      "primary_key": "churn_key",
+      "columns": [
+        { "name": "churn_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "subscriber_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "time_key", "data_type": "INTEGER", "nullable": false },
+        { "name": "churn_date", "data_type": "DATE", "nullable": false },
+        { "name": "churn_reason", "data_type": "TEXT", "nullable": false },
+        { "name": "churn_category", "data_type": "TEXT", "nullable": false },
+        { "name": "status", "data_type": "TEXT", "nullable": false },
+        { "name": "feedback", "data_type": "TEXT", "nullable": false },
+        { "name": "last_payment_date", "data_type": "DATE", "nullable": false },
+        { "name": "lifetime_value", "data_type": "NUMERIC(12,2)", "nullable": false },
+        { "name": "contracts_cancelled", "data_type": "INTEGER", "nullable": false }
+      ],
+      "foreign_keys": [
+        { "column": "subscriber_key", "ref_table": "dim_subscriber", "ref_column": "subscriber_key" },
+        { "column": "time_key", "ref_table": "dim_time", "ref_column": "time_key" }
+      ]
+    }
+  ]
+}
+
