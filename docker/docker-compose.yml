@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:14.19-trixie
+    container_name: postgres
+    ports:
+      - "5433:5432"   # Host port 5433 → container port 5432
+    environment:
+      POSTGRES_USER: magda
+      POSTGRES_PASSWORD: mgda123
+      POSTGRES_DB: telecom
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: always
+
+networks:
+  backend:
