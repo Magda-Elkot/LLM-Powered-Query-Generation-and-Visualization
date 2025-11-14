@@ -69,3 +69,13 @@ class ContextRetriever:
                 f"Foreign Keys: {fk_text}\n"
             )
         return "\n".join(schema_lines)
+
+    def get_table_columns_dict(self):
+        """
+        Returns dict of tables and their columns:
+        {table_name: [column1, column2, ...]}
+        """
+        table_columns = {}
+        for table in self.get_table_names():
+            table_columns[table] = self.get_columns(table)  # col names are already strings
+        return table_columns
