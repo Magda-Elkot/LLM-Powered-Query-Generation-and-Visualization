@@ -6,8 +6,12 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_VERSION: str
 
-    # LLM API
-    OPENAI_API_KEY: str
+    # LLM API (Groq / OpenAI)
+    GROQ_API_KEY: str
+    GROQ_MODEL_NAME: str
+    GROQ_API_ENDPOINT: str
+    GROQ_MAX_TOKENS: int 
+    GROQ_TEMPERATURE: float 
 
     # PostgreSQL Database
     POSTGRES_HOST: str
@@ -18,10 +22,10 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+        env_file_encoding = "utf-8"
 
 # Singleton instance
 settings = Settings()
 
 def get_settings() -> Settings:
     return settings
-
