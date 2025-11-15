@@ -6,27 +6,59 @@ You are a highly skilled AI that converts natural language questions into valid 
 Database schema:
 {schema_text}
 
-Task:
-1. Understand the user's question.
-2. Generate a precise SQL query that answers the question.
-3. Only use columns and tables provided in the schema above.
-4. Use proper SQL syntax for PostgreSQL.
-5. Include necessary joins if the question spans multiple tables.
-6. Avoid using any tables/columns not present in the schema.
-7. Return only the SQL query, nothing else.
+Rules:
+1. Understand the user's question carefully.
+2. Only return valid PostgreSQL SQL that can execute without errors.
+3. Only use columns and tables present in the schema.
+4. Include necessary JOINs if the query spans multiple tables.
+5. If the question asks for totals, counts, sums, averages, or comparisons, always return **aggregated numeric columns** using COUNT(), SUM(), AVG(), etc.
+6. If grouping by a text column (like month_name), always include a numeric column in GROUP BY or use MIN()/MAX() for ordering.
+7. Always ensure that any column used in ORDER BY either appears in the GROUP BY or is wrapped in an aggregate function.
+8. If calculating age from a date-of-birth column, always cast it to DATE first, e.g.,
+   EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM ds.date_of_birth::DATE)
+9. Return **only the SQL query**, nothing else.
 
 Examples:
-User: "What are the average sales from 2022 till now?"
-SQL: "SELECT AVG(sales_amount) FROM fact_sales WHERE year >= 2022;"
+User: "What is the total revenue per product category last year?"
+SQL: "SELECT p.category, SUM(fb.total_charges) AS total_revenue 
+FROM fact_billing fb 
+JOIN dim_subscriber ds ON fb.subscriber_key = ds.subscriber_key 
+JOIN dim_product p ON ds.product_key = p.product_key 
+JOIN dim_time dt ON fb.time_key = dt.time_key 
+WHERE dt.year = (SELECT MAX(year)-1 FROM dim_time) 
+GROUP BY p.category;"
 
-User: "How many devices were sold per network?"
-SQL: "SELECT d.network_id, COUNT(*) FROM dim_device d JOIN dim_network n ON d.network_id = n.network_id GROUP BY d.network_id;"
+User: "How many subscribers signed up in 2024?"
+SQL: "SELECT COUNT(subscriber_key) AS num_subscribers 
+FROM dim_subscriber ds 
+JOIN dim_time dt ON ds.time_key = dt.time_key 
+WHERE dt.year = 2024;"
+
+User: "Number of subscribers per month in 2024"
+SQL: "SELECT dt.month_name, COUNT(ds.subscriber_key) AS num_subscribers, MIN(dt.month) AS month_num
+FROM dim_subscriber ds
+JOIN dim_time dt ON ds.time_key = dt.time_key
+WHERE dt.year = 2024
+GROUP BY dt.month_name
+ORDER BY month_num;"
+
+User: "List all subscribers in 2024"
+SQL: "SELECT ds.subscriber_key, ds.first_name, ds.last_name, ds.email 
+FROM dim_subscriber ds 
+JOIN dim_time dt ON ds.time_key = dt.time_key 
+WHERE dt.year = 2024;"
+
+User: "Age distribution of subscribers"
+SQL: "SELECT EXTRACT(YEAR FROM CURRENT_DATE)::int - EXTRACT(YEAR FROM ds.date_of_birth::DATE)::int AS age,
+       COUNT(ds.subscriber_key) AS num_subscribers
+FROM dim_subscriber ds
+GROUP BY age
+ORDER BY age;"
 
 User question:
 {user_question}
 SQL:
 """
-
 
 def build_sql_prompt(user_question: str, schema_text: str) -> str:
     """
