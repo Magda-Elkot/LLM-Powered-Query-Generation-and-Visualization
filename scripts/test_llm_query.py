@@ -30,7 +30,7 @@ schema_text = context_retriever.generate_schema_text(tables)
 # -------------------------------
 # User Question & Prompt
 # -------------------------------
-user_question = "the subscribers used each product in January 2024?"
+user_question = "i need all the subscribers used each product in January 2024?"
 prompt = build_sql_prompt(user_question, schema_text)
 logger.info("Prompt constructed for LLM.")
 
@@ -54,65 +54,64 @@ async def main():
     sql_query = None
 
     try:
+        # -----------------------
         # Generate SQL via Groq API
+        # -----------------------
         sql_query = await asyncio.to_thread(groq_client.generate_sql, prompt)
 
-        # Strip code blocks if present
-        if "```sql" in sql_query:
-            sql_query = sql_query.split("```sql")[1].split("```")[0].strip()
-
+        # -----------------------
         # Sanitize SQL
+        # -----------------------
         sql_query = QuerySanitizer.sanitize(sql_query)
 
+        # -----------------------
         # Validate SQL (blocks destructive statements)
+        # -----------------------
         validator.validate(sql_query)
 
         logger.info(
-            "\n\n================= SQL OUTPUT (Groq) =================\n%s\n====================================================\n",
+            "\n\n================= SQL OUTPUT (Groq API) =================\n%s\n====================================================\n",
             sql_query
         )
 
     except Exception as e:
-        # If validation blocked the query (DELETE/UPDATE/INSERT/CREATE), stop here
-        if "Only SELECT statements allowed" in str(e):
-            logger.warning("SQL validation failed: %s", e)
-            logger.info("Only SELECT statements are allowed. The SQL will not be executed.")
-            return
+        # Only fallback on API/network issues
+        if any(x in str(e).lower() for x in ["connection", "timeout", "api", "network"]):
+            logger.warning("Groq API failed, falling back to offline LLM: %s", e)
 
-        # Otherwise, fallback to offline LLM (API/network issues, rate limits, etc.)
-        logger.warning("Groq API failed, falling back to offline LLM: %s", e)
+            fallback_llm = LLMFallbackManager(model_path=offline_model_path)
+            offline_prompt = prompt
 
-        fallback_llm = LLMFallbackManager(model_path=offline_model_path)
-        offline_prompt = prompt
+            # Truncate prompt to fit offline model max tokens
+            max_tokens = 1024
+            if fallback_llm.tokenizer:
+                prompt_tokens = fallback_llm.tokenizer.encode(offline_prompt)
+                if len(prompt_tokens) > max_tokens:
+                    logger.warning(
+                        "Prompt too long for offline model, truncating to last %d tokens.", max_tokens
+                    )
+                    prompt_tokens = prompt_tokens[-max_tokens:]
+                    offline_prompt = fallback_llm.tokenizer.decode(prompt_tokens)
 
-        # Truncate prompt to fit offline model max tokens
-        max_tokens = 1024
-        prompt_tokens = fallback_llm.tokenizer.encode(offline_prompt)
-        if len(prompt_tokens) > max_tokens:
-            logger.warning("Prompt too long for offline model, truncating to last %d tokens.", max_tokens)
-            prompt_tokens = prompt_tokens[-max_tokens:]
-            offline_prompt = fallback_llm.tokenizer.decode(prompt_tokens)
+            # Generate SQL offline
+            sql_query_offline = await fallback_llm.generate_sql(offline_prompt)
 
-        # Generate SQL offline
-        sql_query_offline = await fallback_llm.generate_sql(offline_prompt)
-
-        # Strip code blocks
-        if "```sql" in sql_query_offline:
-            sql_query_offline = sql_query_offline.split("```sql")[1].split("```")[0].strip()
-
-        # Sanitize and validate offline SQL
-        try:
+            # Sanitize and validate
             sql_query_offline = QuerySanitizer.sanitize(sql_query_offline)
-            validator.validate(sql_query_offline)
-
-            logger.info(
-                "\n\n================= SQL OUTPUT (Offline) =================\n%s\n========================================================\n",
-                sql_query_offline
-            )
-        except Exception as ve:
-            logger.error("Offline SQL failed validation: %s", ve)
-            logger.info("SQL output (unvalidated) will not be used.")
-
+            try:
+                validator.validate(sql_query_offline)
+                logger.info(
+                    "\n\n================= SQL OUTPUT (Offline) =================\n%s\n========================================================\n",
+                    sql_query_offline
+                )
+            except Exception as ve:
+                logger.error("Offline SQL failed validation: %s", ve)
+                logger.info("SQL output (unvalidated) will not be used.")
+        else:
+            # Other errors (parsing, validation, etc.) are fatal
+            logger.error("SQL generation failed: %s", e)
+            logger.info("Execution stopped due to validation/parsing error.")
+            return
 
 if __name__ == "__main__":
     asyncio.run(main())
