@@ -4,9 +4,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 from config import get_settings
 
-
 settings = get_settings()  # use a consistent variable name
-
 
 class DBConnector:
     """
@@ -24,7 +22,8 @@ class DBConnector:
             f"postgresql://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}"
             f"@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
         )
-        return create_engine(url, echo=False, future=True)
+        # Ensure search_path includes public schema
+        return create_engine(url, echo=False, future=True, connect_args={"options": "-c search_path=public"})
 
     def get_session(self) -> Session:
         """Provides a new SQLAlchemy session."""
