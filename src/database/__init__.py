@@ -1,2 +1,2 @@
-from src.database.db_connector import DBConnector
-from src.database.query_executor import QueryExecutor
+from .db_connector import DBConnector
+from .query_executor import QueryExecutor
