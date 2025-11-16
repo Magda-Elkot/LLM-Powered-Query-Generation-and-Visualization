@@ -3,16 +3,54 @@ services:
     image: postgres:14.19-trixie
     container_name: postgres
     ports:
-      - "5433:5432"   # Host port 5433 → container port 5432
+      - "5433:5432"
     environment:
       POSTGRES_USER: magda
       POSTGRES_PASSWORD: mgda123
       POSTGRES_DB: telecom
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ../postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: always
+
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: telecom-backend
+    depends_on:
+      - postgres
+    env_file:
+      - ../.env
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+    ports:
+      - "8000:8000"
+    command: ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
+    networks:
+      - backend
+    restart: always
+
+  streamlit:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: telecom-ui
+    depends_on:
+      - backend
+    env_file:
+      - ../.env
+    environment:
+      API_URL: "http://backend:8000"
+    ports:
+      - "8501:8501"
+    command: ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
     networks:
       - backend
     restart: always
 
 networks:
   backend:
+  
