@@ -421,21 +421,6 @@
                     "ref_column": "device_key"
                 },
                 {
-                    "column": "product_key",
-                    "ref_table": "dim_product",
-                    "ref_column": "product_key"
-                },
-                {
-                    "column": "time_key",
-                    "ref_table": "dim_time",
-                    "ref_column": "time_key"
-                },
-                {
-                    "column": "sales_channel_key",
-                    "ref_table": "dim_sales_channel",
-                    "ref_column": "sales_channel_key"
-                },
-                {
                     "column": "geography_key",
                     "ref_table": "dim_geography",
                     "ref_column": "geography_key"
@@ -444,6 +429,21 @@
                     "column": "network_key",
                     "ref_table": "dim_network",
                     "ref_column": "network_key"
+                },
+                {
+                    "column": "sales_channel_key",
+                    "ref_table": "dim_sales_channel",
+                    "ref_column": "sales_channel_key"
+                },
+                {
+                    "column": "time_key",
+                    "ref_table": "dim_time",
+                    "ref_column": "time_key"
+                },
+                {
+                    "column": "product_key",
+                    "ref_table": "dim_product",
+                    "ref_column": "product_key"
                 }
             ]
         },
@@ -544,14 +544,14 @@
                     "ref_column": "device_key"
                 },
                 {
-                    "column": "product_key",
-                    "ref_table": "dim_product",
-                    "ref_column": "product_key"
+                    "column": "geography_key",
+                    "ref_table": "dim_geography",
+                    "ref_column": "geography_key"
                 },
                 {
-                    "column": "time_key",
-                    "ref_table": "dim_time",
-                    "ref_column": "time_key"
+                    "column": "network_key",
+                    "ref_table": "dim_network",
+                    "ref_column": "network_key"
                 },
                 {
                     "column": "sales_channel_key",
@@ -559,19 +559,19 @@
                     "ref_column": "sales_channel_key"
                 },
                 {
-                    "column": "geography_key",
-                    "ref_table": "dim_geography",
-                    "ref_column": "geography_key"
-                },
-                {
                     "column": "subscriber_key",
                     "ref_table": "dim_subscriber",
                     "ref_column": "subscriber_key"
                 },
                 {
-                    "column": "network_key",
-                    "ref_table": "dim_network",
-                    "ref_column": "network_key"
+                    "column": "time_key",
+                    "ref_table": "dim_time",
+                    "ref_column": "time_key"
+                },
+                {
+                    "column": "product_key",
+                    "ref_table": "dim_product",
+                    "ref_column": "product_key"
                 }
             ]
         },
@@ -720,11 +720,6 @@
             ],
             "foreign_keys": [
                 {
-                    "column": "invoice_key",
-                    "ref_table": "fact_billing",
-                    "ref_column": "billing_key"
-                },
-                {
                     "column": "subscriber_key",
                     "ref_table": "dim_subscriber",
                     "ref_column": "subscriber_key"
@@ -733,6 +728,11 @@
                     "column": "time_key",
                     "ref_table": "dim_time",
                     "ref_column": "time_key"
+                },
+                {
+                    "column": "invoice_key",
+                    "ref_table": "fact_billing",
+                    "ref_column": "billing_key"
                 }
             ]
         },
