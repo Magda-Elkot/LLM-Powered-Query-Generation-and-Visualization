@@ -3,15 +3,17 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, Optional
 
-from src.run_pipeline import QueryOrchestrator  
+from config.settings import get_settings
+from src.run_pipeline import QueryOrchestrator
+
+settings = get_settings()
 
 app = FastAPI(
-    title="Telecom LLM Query API",
-    version="1.0.0",
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
     description="LLM → SQL → DB → Visualization pipeline for telecom data",
 )
 
-# Single orchestrator instance
 orchestrator = QueryOrchestrator()
 
 
@@ -37,7 +39,6 @@ def query(req: QueryRequest) -> QueryResponse:
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    # Extract chart info
     chart_url = result.chart_payload.get("url")
     chart_config = result.chart_payload.get("config", {})
     chart_type = None

@@ -3,9 +3,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # App info
-    APP_NAME: str
+    APP_NAME: str 
     APP_VERSION: str
-
     # LLM API (Groq / OpenAI)
     GROQ_API_KEY: str
     GROQ_MODEL_NAME: str
@@ -15,10 +14,14 @@ class Settings(BaseSettings):
 
     # PostgreSQL Database
     POSTGRES_HOST: str
-    POSTGRES_PORT: int = 5432
+    POSTGRES_PORT: int 
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
+
+    # Backend URL that Streamlit will call
+    API_URL: str 
+    BACKEND_URL: str
 
     class Config:
         env_file = ".env"

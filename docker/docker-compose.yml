@@ -1,15 +1,17 @@
+version: "3.9"
+
 services:
   postgres:
     image: postgres:14.19-trixie
     container_name: postgres
     ports:
-      - "5433:5432"
+      - "5433:5432"              # host 5433 → container 5432
     environment:
       POSTGRES_USER: magda
       POSTGRES_PASSWORD: mgda123
       POSTGRES_DB: telecom
     volumes:
-      - ../postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
     restart: always
@@ -22,12 +24,13 @@ services:
     depends_on:
       - postgres
     env_file:
-      - ../.env
+      - ../.env                  # APP_NAME, GROQ_API_KEY, POSTGRES_*, API_URL, BACKEND_URL, etc.
     environment:
+      # Override DB host/port inside Docker network
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
     ports:
-      - "8000:8000"
+      - "8000:8000"              # expose FastAPI on localhost:8000
     command: ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
     networks:
       - backend
@@ -43,14 +46,24 @@ services:
     env_file:
       - ../.env
     environment:
+      # Inside Docker network, call backend by its service name
       API_URL: "http://backend:8000"
     ports:
-      - "8501:8501"
-    command: ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+      - "8501:8501"              # Streamlit UI on localhost:8501
+    command:
+      [
+        "streamlit",
+        "run",
+        "app/streamlit_app.py",
+        "--server.port=8501",
+        "--server.address=0.0.0.0"
+      ]
     networks:
       - backend
     restart: always
 
 networks:
   backend:
-  
+
+volumes:
+  postgres_data:

@@ -1,9 +1,12 @@
 # app/streamlit_app.py
-import os
 import requests
 import streamlit as st
 
-API_URL = os.getenv("\q", "http://localhost:8000")
+from config.settings import get_settings
+
+settings = get_settings()
+# Prefer BACKEND_URL (inside Docker), fallback to API_URL, then localhost
+API_URL = settings.BACKEND_URL or settings.API_URL or "http://localhost:8000"
 
 st.set_page_config(page_title="Telecom LLM Query UI", layout="wide")
 
@@ -14,8 +17,8 @@ st.markdown(
     Enter a natural language question about the telecom data.
 
     The UI calls the FastAPI backend, which:
-    1. Uses an LLM to generate SQL
-    2. Executes it on the PostgreSQL database
+    1. Uses an LLM to generate SQL  
+    2. Executes it on the PostgreSQL database  
     3. Returns a preview and a chart URL (via QuickChart)
     """
 )
@@ -35,26 +38,20 @@ if st.button("Run query") and question:
         else:
             payload = resp.json()
 
-            # --- SQL ---
             st.subheader("Generated SQL")
             st.code(payload["sql"], language="sql")
 
-            # --- Data preview (text from df_preview) ---
             st.subheader("Data Preview")
             if payload.get("df_preview"):
                 st.text(payload["df_preview"])
             else:
                 st.info("No data preview available.")
 
-            # --- Visualization ---
             st.subheader("Visualization")
-
-            chart_type = payload.get("chart_type")
             chart_url = payload.get("chart_url")
             chart_title = payload.get("chart_title") or "Chart"
             message = payload.get("message")
 
-            # handle error / empty cases from your pipeline
             if message:
                 st.warning(message)
 

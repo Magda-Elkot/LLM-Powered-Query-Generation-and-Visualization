@@ -25,7 +25,7 @@ def infer_chart(
     sql_query: str | None = None
 ) -> ChartSpec:
 
-    # 🔧 FIX: Convert numeric text columns to numeric
+    # FIX: Convert numeric text columns to numeric
     for col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="ignore")
 

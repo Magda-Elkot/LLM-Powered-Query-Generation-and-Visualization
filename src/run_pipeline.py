@@ -3,19 +3,10 @@
 from dataclasses import dataclass
 from typing import Dict, Any, Optional
 
-from src.context.schema_manager import SchemaManager
-from src.context.context_retriever import ContextRetriever
-from src.database.db_connector import DBConnector
-from src.database.query_executor import QueryExecutor
-from src.llm.groq_client import GroqClient
-from src.llm.prompt_templates import build_sql_prompt
-from src.validation.sql_validator import SQLValidator
-from src.validation.query_sanitizer import QuerySanitizer
-from src.visualization.chart_selector import infer_chart
-from src.visualization.renderers import render
-from config.settings import get_settings
+from src import SchemaManager, ContextRetriever, DBConnector, QueryExecutor, GroqClient, build_sql_prompt, SQLValidator, QuerySanitizer, infer_chart, render, ChartSpec
 
-from src.visualization.chart_selector import ChartSpec  # ensure ChartSpec is imported
+from config import get_settings
+
 
 
 @dataclass
@@ -120,7 +111,7 @@ class QueryOrchestrator:
 
 if __name__ == "__main__":
     orchestrator = QueryOrchestrator()
-    question = "hello"
+    question = "Number of subscribers by age"
     result = orchestrator.run(question)
 
     print("===== SQL =====")

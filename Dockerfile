@@ -8,16 +8,18 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (for caching)
+# Install dependencies
 COPY requirements.txt .
-
 RUN pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-# Copy entire project
+#  IMPORTANT: make root of repo importable (so `config` works)
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+
+# Copy code
 COPY . .
 
 EXPOSE 8000 8501
 
-# Default command (FastAPI)
+# Default command for backend container
 CMD ["uvicorn", "app.api:app", "--host", "0.0.0.0", "--port", "8000"]
