@@ -27,12 +27,15 @@ class SQLValidator:
         stmt = statements[0]
         stmt_type = stmt.get_type().upper()
 
-        # Block forbidden statements
-        if stmt_type in self.FORBIDDEN:
+        # Check if it starts with SELECT (covers string literal selects)
+        if stmt_type == "UNKNOWN":
+            if not sql_query.strip().upper().startswith("SELECT"):
+                raise ValueError(f"Only SELECT queries allowed. Detected: {stmt_type}")
+
+        elif stmt_type in self.FORBIDDEN:
             raise ValueError(f"Only SELECT queries allowed. Detected: {stmt_type}")
 
-        # Handle CTEs reported as UNKNOWN by sqlparse
-        if stmt_type not in ("SELECT", "UNKNOWN"):
+        elif stmt_type != "SELECT":
             raise ValueError(f"Statement type not allowed: {stmt_type}")
 
         return True

@@ -6,6 +6,7 @@ from src.database.query_executor import QueryExecutor
 
 from src.llm.groq_client import GroqClient
 from src.llm.prompt_templates import build_sql_prompt
+from src.llm.llm_fallback_manager import LLMFallbackManager
 
 from src.validation.query_sanitizer import QuerySanitizer
 from src.validation.sql_validator import SQLValidator

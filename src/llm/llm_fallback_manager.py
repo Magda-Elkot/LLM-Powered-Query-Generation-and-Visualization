@@ -1,49 +1,68 @@
 # src/llm/llm_fallback_manager.py
+
 import logging
-import os
-
+ 
 logger = logging.getLogger(__name__)
+
 logger.setLevel(logging.INFO)
-
-try:
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-    import torch
-    HF_AVAILABLE = True
-except ImportError:
-    HF_AVAILABLE = False
-    logger.warning("Transformers not installed. Offline LLM will use placeholder output.")
-
-
+ 
+ 
 class LLMFallbackManager:
+
     """
-    Offline-only manager: wraps a local Hugging Face model.
+
+    Ultra-lightweight fallback LLM.
+ 
+    - Does NOT load any local model (no disk, no GPU, no transformers).
+
+    - Just returns a small, safe SQL statement that the pipeline can execute.
+
+    - The QueryOrchestrator will then treat it as a 'message' response and
+
+      show a friendly text in the UI instead of crashing.
+
     """
-    def __init__(self, model_path: str):
-        self.model = None
-        self.tokenizer = None
+ 
+    def __init__(self) -> None:
 
-        if not os.path.exists(model_path):
-            logger.error(f"Offline model path does not exist: {model_path}")
-            return
+        # No heavy initialization needed
 
-        if HF_AVAILABLE:
-            try:
-                logger.info(f"Loading offline model from {model_path}")
-                self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-                self.model = AutoModelForCausalLM.from_pretrained(model_path, device_map="cpu")
-            except Exception as e:
-                logger.error(f"Failed to load offline model: {e}")
-        else:
-            logger.warning("Transformers not available. Offline LLM cannot run.")
+        pass
+ 
+    def generate_sql(self, prompt: str) -> str:
 
-    async def generate_sql(self, prompt: str) -> str:
-        if self.model is not None:
-            import asyncio
-            inputs = self.tokenizer(prompt, return_tensors="pt")
-            outputs = await asyncio.to_thread(
-                lambda: self.model.generate(**inputs, max_new_tokens=256, pad_token_id=self.tokenizer.eos_token_id)
-            )
-            sql = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-            return sql
-        else:
-            return "-- Offline placeholder SQL.\nSELECT 1;"
+        """
+
+        Return a simple SQL that your pipeline can execute safely.
+ 
+        We use the 'message' column on purpose, because your QueryOrchestrator
+
+        already has a special case for:
+
+          SELECT '...' AS message;
+
+        """
+
+        truncated_prompt = prompt[:120].replace("\n", " ")
+
+        logger.warning(
+
+            "Using fallback SQL generator (remote LLM unavailable). "
+
+            "Prompt (truncated): %s",
+
+            truncated_prompt,
+
+        )
+ 
+        return (
+
+            "SELECT "
+
+            "'LLM offline – cannot generate SQL for this question right now. "
+
+            "Please try again later or contact the admin.' AS message;"
+
+        )
+
+ 
