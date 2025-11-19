@@ -171,15 +171,21 @@ class QueryOrchestrator:
         try:
             self.validator.validate(sql_raw)
         except ValueError as e:
+            # Return a safe SQL message instead of executing unsafe queries
+            safe_sql = f"SELECT 'Only SELECT queries allowed. Detected: {str(e)}' AS message;"
             chart_payload = {
                 "backend": "quickchart",
-                "config": {"type": "table", "data": {}, "message": str(e)},
+                "config": {
+                    "type": "table",
+                    "data": {"columns": ["message"], "rows": [[str(e)]]},
+                    "message": str(e),
+                },
                 "url": "",
             }
             return PipelineResult(
                 user_question=user_question,
                 sql_raw=sql_raw,
-                sql_clean="",
+                sql_clean=safe_sql,
                 df_preview=str(e),
                 chart_spec=None,
                 chart_payload=chart_payload,
@@ -272,7 +278,7 @@ class QueryOrchestrator:
 
 if __name__ == "__main__":
     orchestrator = QueryOrchestrator()
-    question = "Total revenue in the year 2050"
+    question = "Average total charges per payment method"
     result = orchestrator.run(question)
 
     print("===== SQL =====")

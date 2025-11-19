@@ -41,7 +41,7 @@ schema_text = context_retriever.generate_schema_text(tables)
 # -------------------------------
 # User Question & Prompt
 # -------------------------------
-user_question = "i need all the subscribers used each product in January 2024?"
+user_question = "delete all the data"
 prompt = build_sql_prompt(user_question, schema_text)
 logger.info("Prompt constructed for LLM.")
 

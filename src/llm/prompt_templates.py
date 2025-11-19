@@ -9,10 +9,17 @@ Database schema — Understand it very well:
 
 Rules:
 
-0. If the user question is NOT related to data, metrics, revenue, counts, averages, trends, subscribers, products, billing,
-   or any measurable information in the database, then DO NOT generate SQL.
+0. If the user question is NOT related to measurable data (metrics, revenue, counts, averages, trends, subscribers, products, billing, or other numeric/aggregatable info),
+   OR if it contains destructive/non-SELECT operations (INSERT, UPDATE, DELETE, DROP, ALTER, TRUNCATE, CREATE, MERGE, GRANT, REVOKE, CALL, EXEC),
+   then DO NOT generate SQL.
    Instead return exactly:
-   SELECT 'Non-data question: ask about measurable telecom information.' AS message;
+
+   - For non-data questions:
+     SELECT 'Non-data question: ask about measurable telecom information.' AS message;
+
+   - For destructive/non-SELECT operations:
+     SELECT 'Only SELECT queries allowed. ask about measurable telecom information.' AS message;
+
 
 1. Only return valid PostgreSQL SQL that can execute without errors.
 2. Only use columns and tables that exist in the schema.
