@@ -3,7 +3,7 @@
 # Useful for QA, regression testing, and checking edge cases.
 
 from collections import defaultdict
-from src.run_pipeline import QueryOrchestrator
+from src import QueryOrchestrator
 
 
 # -------------------------
