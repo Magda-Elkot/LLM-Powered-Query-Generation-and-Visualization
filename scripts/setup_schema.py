@@ -31,7 +31,10 @@ if os.path.exists(json_path):
 # -------------------------
 try:
     sm = SchemaManager(args.excel)
-    sm.build()  # Convert Excel → JSON → PostgreSQL tables
+    sm.build()
     print("Schema setup complete!")
 except Exception as e:
-    print("Error during schema setup:", e)
+    print("Warning: Error during schema setup, retrying...", e)
+    sm.build()  # second attempt
+    print("Schema setup complete on retry!")
+    
