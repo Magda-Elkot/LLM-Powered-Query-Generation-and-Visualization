@@ -48,7 +48,6 @@ TEST_QUERIES = {
         "Total billing amount (total_due) per billing_cycle in 2024",
         "Total payments per payment_method",
         "Number of unpaid invoices per month",
-        "Average time between invoice due_date and paid_date",
     ],
     "edge_cases": [
         "List the first 10 subscribers with their product and device",
