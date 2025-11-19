@@ -31,7 +31,8 @@ class SQLValidator:
         if stmt_type == "UNKNOWN":
             if not sql_query.strip().upper().startswith("SELECT"):
                 raise ValueError(f"Only SELECT queries allowed. Detected: {stmt_type}")
-
+                
+        # Block explicitly forbidden commands
         elif stmt_type in self.FORBIDDEN:
             raise ValueError(f"Only SELECT queries allowed. Detected: {stmt_type}")
 

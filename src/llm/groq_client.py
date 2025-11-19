@@ -10,7 +10,14 @@ logger.setLevel(logging.INFO)
 settings = get_settings()
 
 class GroqClient:
-    """Client to interact with Groq API for SQL generation."""
+    """
+    Lightweight wrapper around Groq API for generating SQL from natural language prompts.
+
+    Responsibilities:
+    - Handle API key and model settings
+    - Provide synchronous or async SQL generation
+    - Log success/failure for debugging
+    """
 
     def __init__(self, model: str = None):
         self.api_key = settings.GROQ_API_KEY
@@ -20,7 +27,11 @@ class GroqClient:
         self.client = Groq(api_key=self.api_key)
 
     async def _generate_sql_async(self, prompt: str) -> str:
+        """
+        Internal async method to generate SQL via Groq.
+        """
         try:
+            # Send prompt to Groq chat endpoint
             response = self.client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model=self.model
@@ -33,4 +44,8 @@ class GroqClient:
             raise
 
     def generate_sql(self, prompt: str) -> str:
+        """
+        Synchronous wrapper to call the async Groq API method.
+        Can be used directly in scripts without asyncio.
+        """
         return asyncio.run(self._generate_sql_async(prompt))

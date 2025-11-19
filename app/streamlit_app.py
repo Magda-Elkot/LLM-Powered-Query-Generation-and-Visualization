@@ -1,13 +1,19 @@
 # app/streamlit_app.py
+# Streamlit frontend for telecom LLM-powered query system.
+# Calls FastAPI backend to generate SQL, execute it, and render charts.
+
 import requests
 import streamlit as st
 
 from config.settings import get_settings
 
+# Load configuration
 settings = get_settings()
+
 # Prefer BACKEND_URL (inside Docker), fallback to API_URL, then localhost
 API_URL = settings.BACKEND_URL or settings.API_URL or "http://localhost:8000"
 
+# Streamlit page config
 st.set_page_config(page_title="Telecom LLM Query UI", layout="wide")
 
 st.title("📊 Telecom LLM-Powered Query & Visualization")
@@ -23,11 +29,13 @@ st.markdown(
     """
 )
 
+# Input for user question
 question = st.text_input(
     "Your question:",
     placeholder="e.g. Show me total revenue per product category last year",
 )
 
+# Button to trigger backend request
 if st.button("Run query") and question:
     try:
         with st.spinner("Contacting backend..."):
@@ -38,15 +46,18 @@ if st.button("Run query") and question:
         else:
             payload = resp.json()
 
+            # Show generated SQL
             st.subheader("Generated SQL")
             st.code(payload["sql"], language="sql")
 
+            # Show data preview if available
             st.subheader("Data Preview")
             if payload.get("df_preview"):
                 st.text(payload["df_preview"])
             else:
                 st.info("No data preview available.")
 
+            # Render chart if available
             st.subheader("Visualization")
             chart_url = payload.get("chart_url")
             chart_title = payload.get("chart_title") or "Chart"

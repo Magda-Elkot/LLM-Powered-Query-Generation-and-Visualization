@@ -29,6 +29,13 @@ def infer_chart(
     for col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="ignore")
 
+    # (all NaN) datasets → show message instead of empty chart    
+    if df.isna().all().all():
+        return ChartSpec(
+            chart_type="table",
+            title="No data available for the selected query or filters"
+        )
+
     if df.empty or df.shape[1] == 0:
         return ChartSpec(chart_type="table", title="No data returned")
 

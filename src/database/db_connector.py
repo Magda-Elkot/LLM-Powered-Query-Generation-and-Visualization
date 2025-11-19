@@ -13,6 +13,7 @@ class DBConnector:
     """
 
     def __init__(self):
+        # Initialize engine and session factory
         self.engine = self._create_engine()
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
 

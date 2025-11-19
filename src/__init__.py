@@ -13,5 +13,7 @@ from src.validation.sql_validator import SQLValidator
 
 from src.visualization.chart_selector import infer_chart, ChartSpec
 from src.visualization.renderers import render
+from src.run_pipeline import QueryOrchestrator, PipelineResult
+
 
 

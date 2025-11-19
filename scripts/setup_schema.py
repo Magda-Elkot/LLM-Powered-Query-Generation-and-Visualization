@@ -24,14 +24,14 @@ if not os.path.exists(args.excel):
 # -------------------------
 json_path = "config/schema_metadata.json"
 if os.path.exists(json_path):
-    print(f"⚠ Schema metadata already exists at {json_path}. Running will overwrite it.")
+    print(f"Schema metadata already exists at {json_path}. Running will overwrite it.")
 
 # -------------------------
 # Run SchemaManager
 # -------------------------
 try:
     sm = SchemaManager(args.excel)
-    sm.build()  # Excel → JSON → PostgreSQL tables
+    sm.build()  # Convert Excel → JSON → PostgreSQL tables
     print("Schema setup complete!")
 except Exception as e:
     print("Error during schema setup:", e)

@@ -1,14 +1,25 @@
+# scripts/test_llm_query.py
 import asyncio
 import logging
-import os
+import pandas as pd
 
-from src.llm.llm_fallback_manager import LLMFallbackManager
-from src.llm.groq_client import GroqClient
-from src.llm.prompt_templates import build_sql_prompt
-from src.validation.sql_validator import SQLValidator
-from src.validation.query_sanitizer import QuerySanitizer
-from src import ContextRetriever
 from config import get_settings
+
+from src import (
+    SchemaManager,
+    ContextRetriever,
+    DBConnector,
+    QueryExecutor,
+    GroqClient,
+    build_sql_prompt,
+    LLMFallbackManager,
+    QuerySanitizer,
+    SQLValidator,
+    infer_chart,
+    ChartSpec,
+    render,
+)
+
 
 # -------------------------------
 # Logging Setup
@@ -35,16 +46,10 @@ prompt = build_sql_prompt(user_question, schema_text)
 logger.info("Prompt constructed for LLM.")
 
 # -------------------------------
-# Offline model path (fallback)
-# -------------------------------
-offline_model_path = os.path.abspath(
-    "./models/distilgpt2/models--distilgpt2/snapshots/2290a62682d06624634c1f46a6ad5be0f47f38aa"
-)
-
-# -------------------------------
 # Initialize SQL Validator
 # -------------------------------
 validator = SQLValidator()
+fallback_llm = LLMFallbackManager()
 
 # -------------------------------
 # Async main
@@ -54,64 +59,48 @@ async def main():
     sql_query = None
 
     try:
-        # -----------------------
         # Generate SQL via Groq API
-        # -----------------------
         sql_query = await asyncio.to_thread(groq_client.generate_sql, prompt)
-
-        # -----------------------
-        # Sanitize SQL
-        # -----------------------
         sql_query = QuerySanitizer.sanitize(sql_query)
-
-        # -----------------------
-        # Validate SQL (blocks destructive statements)
-        # -----------------------
         validator.validate(sql_query)
-
-        logger.info(
-            "\n\n================= SQL OUTPUT (Groq API) =================\n%s\n====================================================\n",
-            sql_query
-        )
+        logger.info("SQL generated (Groq API):\n%s", sql_query)
 
     except Exception as e:
-        # Only fallback on API/network issues
-        if any(x in str(e).lower() for x in ["connection", "timeout", "api", "network"]):
-            logger.warning("Groq API failed, falling back to offline LLM: %s", e)
+        # Use fallback LLM for any Groq API/network errors
+        logger.warning("Groq API failed, using fallback LLM: %s", e)
+        sql_query = fallback_llm.generate_sql(prompt)
+        logger.info("SQL generated (Fallback LLM):\n%s", sql_query)
 
-            fallback_llm = LLMFallbackManager(model_path=offline_model_path)
-            offline_prompt = prompt
+    # -------------------------------
+    # Execute SQL
+    # -------------------------------
+    db = DBConnector()
+    executor = QueryExecutor(db)
+    try:
+        df: pd.DataFrame = executor.execute(sql_query)
+        logger.info("Query returned %d rows", len(df))
+        logger.info("\nData Preview:\n%s", df.head())
+    except Exception as e:
+        logger.error("SQL execution failed: %s", e)
+        return
 
-            # Truncate prompt to fit offline model max tokens
-            max_tokens = 1024
-            if fallback_llm.tokenizer:
-                prompt_tokens = fallback_llm.tokenizer.encode(offline_prompt)
-                if len(prompt_tokens) > max_tokens:
-                    logger.warning(
-                        "Prompt too long for offline model, truncating to last %d tokens.", max_tokens
-                    )
-                    prompt_tokens = prompt_tokens[-max_tokens:]
-                    offline_prompt = fallback_llm.tokenizer.decode(prompt_tokens)
+    # -------------------------------
+    # Infer chart type and render
+    # -------------------------------
+    spec = infer_chart(df, user_question=user_question, sql_query=sql_query)
+    logger.info("Inferred chart spec: %s", spec)
 
-            # Generate SQL offline
-            sql_query_offline = await fallback_llm.generate_sql(offline_prompt)
+    chart_output = render(df, spec, backend="quickchart")
+    logger.info("Chart URL: %s", chart_output.get("url"))
 
-            # Sanitize and validate
-            sql_query_offline = QuerySanitizer.sanitize(sql_query_offline)
-            try:
-                validator.validate(sql_query_offline)
-                logger.info(
-                    "\n\n================= SQL OUTPUT (Offline) =================\n%s\n========================================================\n",
-                    sql_query_offline
-                )
-            except Exception as ve:
-                logger.error("Offline SQL failed validation: %s", ve)
-                logger.info("SQL output (unvalidated) will not be used.")
-        else:
-            # Other errors (parsing, validation, etc.) are fatal
-            logger.error("SQL generation failed: %s", e)
-            logger.info("Execution stopped due to validation/parsing error.")
-            return
+    # Print results
+    print("\n===== SQL =====")
+    print(sql_query)
+    print("\n===== Data Preview =====")
+    print(df.head())
+    print("\n===== Chart URL =====")
+    print(chart_output.get("url"))
+
 
 if __name__ == "__main__":
     asyncio.run(main())

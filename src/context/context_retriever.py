@@ -5,8 +5,15 @@ from typing import List, Dict, Optional
 
 class ContextRetriever:
     """
-    Retrieves schema context from the JSON metadata produced by SchemaManager.
-    Provides methods to get tables, columns, foreign keys, and LLM-friendly schema descriptions.
+    ContextRetriever handles reading schema metadata from a JSON file produced by SchemaManager.
+
+    Provides helper methods to:
+    - Fetch table names, columns, primary keys, and foreign keys.
+    - Find tables containing a specific column.
+    - Generate textual schema descriptions suitable for LLM prompts.
+    - Return a dictionary mapping tables to their columns.
+
+    This class abstracts schema access, so other modules do not need to parse JSON manually.
     """
 
     def __init__(self, schema_json_path: str = "config/schema_metadata.json"):

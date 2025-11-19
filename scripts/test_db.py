@@ -1,9 +1,16 @@
 # scripts/test_db.py
+# Utility script to test PostgreSQL connectivity and schema metadata
+# Verifies that the database connection works and that schema access functions return expected results
+# Also tests sample query execution and scalar queries for basic validation
+
 import sys
 from src import ContextRetriever, DBConnector, QueryExecutor
 
 
 def main():
+    # -------------------------
+    # Test Database Connectivity
+    # -------------------------
     print("=== Database Connectivity Test ===")
     db = DBConnector()
     if db.test_connection():
@@ -12,12 +19,16 @@ def main():
         print("Failed to connect to PostgreSQL")
         sys.exit(1)
 
+    # -------------------------
+    # Test Schema Metadata Access
+    # -------------------------
     print("\n=== Schema Metadata Test ===")
     context = ContextRetriever()
     table_names = context.get_table_names()
     print(f"Tables found ({len(table_names)}): {table_names}")
 
     # Test each schema access method
+    # Inspect each table's schema: primary keys, columns, foreign keys
     for table in table_names:
         pk = context.get_primary_key(table)
         cols = context.get_columns(table)
@@ -33,10 +44,13 @@ def main():
     print(f"\nTables containing column '{sample_column}': {tables_with_column or 'None'}")
 
     # Test generate_schema_text
+    # Generate and preview schema text (for first 3 tables)
     schema_text = context.generate_schema_text(table_names[:3])  # limit output
     print("\n=== Schema Text Snippet (first 3 tables) ===")
     print(schema_text[:800])  # show a snippet only
 
+    # -------------------------
+    # Test Query Execution
     print("\n=== Query Execution Test ===")
     executor = QueryExecutor(db)
 

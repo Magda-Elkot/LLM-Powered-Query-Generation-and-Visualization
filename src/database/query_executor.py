@@ -19,8 +19,8 @@ class QueryExecutor:
 
     def _ensure_single_statement(self, sql: str):
         """
-        Ensure SQL does not contain multiple statements.
-        Validator checks SQL type, but not multi-statement attacks.
+        Extra safety check to prevent multi-statement SQL injections.
+        Even though validation occurs earlier, this ensures no accidental ';' chaining.
         """
         if ";" in sql.strip():
             raise ValueError("Multiple SQL statements are not allowed.")
@@ -28,12 +28,13 @@ class QueryExecutor:
     def execute(self, sql: str, params: dict = None) -> pd.DataFrame:
         params = params or {}
 
-        # Only extra safety required at executor level
+        # Only extra safety required at executor level, Safety: prevent multi-statement execution
         self._ensure_single_statement(sql)
 
         try:
             with self.db_connector.get_session() as session:
                 result = session.execute(text(sql), params)
+                # Convert result to DataFrame for downstream analysis
                 df = pd.DataFrame(result.fetchall(), columns=result.keys())
                 return df
 
@@ -42,6 +43,10 @@ class QueryExecutor:
             raise RuntimeError(f"Database execution failed: {e}")
 
     def execute_scalar(self, sql: str, params: dict = None):
+        """
+        Execute a query expected to return a single value (scalar).
+        Useful for COUNT(*) or aggregation queries.
+        """
         params = params or {}
 
         self._ensure_single_statement(sql)

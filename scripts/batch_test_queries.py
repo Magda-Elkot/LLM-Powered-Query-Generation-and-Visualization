@@ -1,9 +1,14 @@
 # scripts/batch_test_queries.py
+# Script to run a batch of test queries through the LLM → SQL → DB → Visualization pipeline.
+# Useful for QA, regression testing, and checking edge cases.
 
 from collections import defaultdict
 from src.run_pipeline import QueryOrchestrator
 
 
+# -------------------------
+# Define test queries grouped by category
+# -------------------------
 TEST_QUERIES = {
     "basic_counts": [
         "How many subscribers do we have in total?",
@@ -54,6 +59,9 @@ TEST_QUERIES = {
 }
 
 
+# -------------------------
+# Classify pipeline result into categories for reporting
+# -------------------------
 def classify_result(result) -> str:
     """
     Classify the pipeline output into:
@@ -89,11 +97,15 @@ def classify_result(result) -> str:
     return "ok"
 
 
+# -------------------------
+# Main runner
+# -------------------------
 def main():
     orchestrator = QueryOrchestrator()
     summary_counts = defaultdict(int)
     detailed_results = []
 
+    # Iterate over test queries grouped by category
     for group_name, questions in TEST_QUERIES.items():
         print(f"\n=== Group: {group_name} ===")
         for q in questions:
@@ -122,12 +134,10 @@ def main():
                 }
             )
 
+    # Print summary counts for all categories
     print("\n\n===== SUMMARY =====")
     for status, count in summary_counts.items():
         print(f"{status}: {count}")
-
-    # If you want to later inspect detailed_results in a notebook, you can
-    # turn it into a DataFrame. For plain script, printing is enough.
 
 
 if __name__ == "__main__":

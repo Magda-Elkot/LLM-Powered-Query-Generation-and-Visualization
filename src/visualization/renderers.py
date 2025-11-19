@@ -9,6 +9,19 @@ from .chart_selector import ChartSpec
 Backend = Literal["quickchart"]
 
 def render(df: pd.DataFrame, spec: ChartSpec, backend: Backend = "quickchart") -> Dict[str, Any]:
+    """
+    Render a chart from a DataFrame and a ChartSpec using the chosen backend.
+
+    Currently only supports QuickChart.io.
+
+    Args:
+        df: pandas DataFrame containing query results.
+        spec: ChartSpec describing chart type, axes, labels, and title.
+        backend: Visualization backend to use. Default is 'quickchart'.
+
+    Returns:
+        A dictionary with rendered chart information including a URL for visualization.
+    """
     if backend == "quickchart":
         return render_quickchart(df, spec)
     else:
@@ -16,6 +29,18 @@ def render(df: pd.DataFrame, spec: ChartSpec, backend: Backend = "quickchart") -
 
 
 def render_quickchart(df: pd.DataFrame, spec: ChartSpec) -> Dict[str, Any]:
+    """
+    Convert a ChartSpec and DataFrame into a QuickChart.io URL and chart configuration.
+
+    Handles multiple chart types: line, bar, pie, histogram, scatter, and table fallback.
+
+    Args:
+        df: pandas DataFrame with query results.
+        spec: ChartSpec describing chart configuration.
+
+    Returns:
+        Dictionary with 'backend', 'config', and 'url'.
+    """
 
     # --- LINE & BAR ---
     if spec.chart_type in ("line", "bar"):
@@ -87,9 +112,11 @@ def render_quickchart(df: pd.DataFrame, spec: ChartSpec) -> Dict[str, Any]:
             },
         }
 
-    else:  # TABLE fallback → no real chart
+    # TABLE fallback → no real chart
+    else:  
         config = {"type": "table", "data": {}}
 
+    # Encode configuration as URL for QuickChart.io
     encoded = urllib.parse.quote(json.dumps(config))
     url = f"https://quickchart.io/chart?c={encoded}"
 

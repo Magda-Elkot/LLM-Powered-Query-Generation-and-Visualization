@@ -24,6 +24,24 @@ SQLALCHEMY_TYPE_MAP = {
 
 
 class SchemaManager:
+    """
+    SchemaManager handles the creation and management of the database schema
+    from an Excel-based data model for PostgreSQL.
+
+    Responsibilities include:
+
+    - Loading schema/data from Excel sheets into pandas DataFrames.
+    - Generating JSON metadata describing tables, columns, primary keys, and foreign keys.
+    - Saving the metadata to a JSON file for downstream LLM and pipeline usage.
+    - Creating PostgreSQL tables based on the schema metadata (with proper PKs and FKs).
+    - Loading and upserting data into PostgreSQL tables safely.
+    - Providing a full build() method to run the entire pipeline in one call.
+
+    This class abstracts the details of schema management so that other
+    components in the pipeline (LLM query generation, visualization) can
+    rely on a consistent database structure.
+    """
+
     def __init__(self, excel_path: str, schema_json_path: str = "config/schema_metadata.json"):
         self.excel_path = excel_path
         self.schema_json_path = schema_json_path

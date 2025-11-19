@@ -4,7 +4,6 @@ import logging
 from dataclasses import dataclass
 from typing import Dict, Any, Optional
 
-# keep this import EXACTLY as you had it
 from src import (
     SchemaManager,
     ContextRetriever,
@@ -21,7 +20,6 @@ from src import (
 )
 
 
-from config import get_settings  # even if not used, keep it as before
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -70,7 +68,7 @@ class QueryOrchestrator:
             self.llm_client = None
             self.primary_llm_available = False
 
-        # Validation & DB
+        # Validator, sanitizer, DB connection, and query executor
         self.sanitizer = QuerySanitizer()
         self.validator = SQLValidator()
         self.db_connector = DBConnector()
@@ -112,6 +110,9 @@ class QueryOrchestrator:
     # Helper: generate SQL, with primary + fallback
     # ------------------------------------------------------------------ #
     def _generate_sql_with_fallback(self, prompt: str) -> str:
+        """
+        Generate SQL using Groq LLM; switch to fallback if primary is unavailable or transient error occurs.
+        """
         if not self.primary_llm_available or self.llm_client is None:
             logger.info("Primary LLM not available at init. Using fallback directly.")
             return self.fallback_llm.generate_sql(prompt)
@@ -130,7 +131,16 @@ class QueryOrchestrator:
             raise
 
     # ------------------------------------------------------------------ #
+    # Main pipeline execution
+    # ------------------------------------------------------------------ #
     def run(self, user_question: str) -> PipelineResult:
+        """
+        Run the full pipeline for a single user question.
+
+        Returns:
+            PipelineResult containing SQL, DataFrame preview, chart specification, and rendered chart.
+        """
+
         # 1) Build schema text for the prompt
         schema_text = self.context.generate_schema_text()
 
@@ -249,6 +259,7 @@ class QueryOrchestrator:
         # 10) Render chart
         chart_payload = render(df, chart_spec, backend="quickchart")
 
+        # 11) Return final pipeline result
         return PipelineResult(
             user_question=user_question,
             sql_raw=sql_raw,
@@ -261,7 +272,7 @@ class QueryOrchestrator:
 
 if __name__ == "__main__":
     orchestrator = QueryOrchestrator()
-    question = "Top 5 products by total revenue"
+    question = "Total revenue in the year 2050"
     result = orchestrator.run(question)
 
     print("===== SQL =====")
