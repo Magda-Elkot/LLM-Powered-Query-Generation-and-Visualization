@@ -5,7 +5,7 @@
 import requests
 import streamlit as st
 
-from config.settings import get_settings
+from config import get_settings
 
 # Load configuration
 settings = get_settings()

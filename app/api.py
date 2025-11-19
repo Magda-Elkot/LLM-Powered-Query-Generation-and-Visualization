@@ -3,8 +3,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Any, Dict, Optional
 
-from config.settings import get_settings
-from src.run_pipeline import QueryOrchestrator
+from config import get_settings
+from src import QueryOrchestrator
 
 # Retrieve configuration
 settings = get_settings()
