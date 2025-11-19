@@ -64,13 +64,6 @@ source .venv/bin/activate       # Linux/macOS
 # .venv\Scripts\activate        # Windows
 ```
 
-#### Option B: Conda
-
-```bash
-conda create -n telecom-llm python=3.10
-conda activate telecom-llm
-```
-
 ---
 
 ### 3.3 Install Dependencies
@@ -229,13 +222,28 @@ UI:       http://localhost:8501
 ```
 question → prompt → LLM SQL → sanitize → validate → execute → chart → return result
 ```
+### Architecture Diagram
+
+![alt text](image.png)
+
+
+Or view the interactive diagram: [Link Text](https://mermaid.live/view#pako:eNp1VNty2jAQ_RWNnpIp0HCJA37oTDAYaCEYG_JQkclsbAEqsgSynCv598o2l5KZPlnec86udveMPnAoI4ptXC6X5yKUYsGW9lwgxKVc2yjkkCQsnIscXnD5Eq5AaTT0Mw5CMzJLqHpA5fKP3R3oVAFHHMQyhSVF25QmmkmxQ8GUBFpRiDnTaDZ4KMTBNNd5Y3P4bsjqbYduvQFxIdHmi9oQrqmI9uwsYuho7Dt9MsnYYxWuTAUFWqo9KQNzluMTRwpNX7VPtWL0mR4ojp8TRt3pLblITIYYHmOqIQINlT-JFJdfc3n-eORNyVPKePSYbPnjRsl4o_e0As2JPYf0lNw6nFFxgHvO8dbnaXeDBdooFoN6QwtgPNkht02Gw5ELnD-Z1kcgzBQP13bb_8mDJkExjgAE0-z9qJgEORzck2AyvAfOon8GFdwX2m6h7b7SMD2hk26OdtrkwpOJXipqUiBNOQ1lbMKXX3gu8UBEkKCOGaKrIKZ7QsfNCQMnIE5mnCBLcapj4sW2-nt4Q8Nzpd-96xDfuICq0wb7R6gIZKeiHce0w8J1ngzN_OHhnsUSjIXOvLT7GYzvbJT19g15ij4z-mJOuToz7ZlNp_DE6Qmdnbuy7_R_kV7XGHlFgeuVKYxLeKlYhG2tUlrCMVUxZL_4I5POsTbWo3Nsm2MEaj3Hc_FpNBsQv6WMDzIl0-UK2wvgiflLN2aJtMNgaYZ8pOTjcWQqNLZrtUaeA9sf-BXb5aZVq1xZVrNVq7eajUa1XsJv2G5dVVpXVr1RbzaarepN9fqzhN_zqtXKzfV1rdqwqlatcVOtt6wSphEzOxsVD0X-Xnz-BfybR1Y)
 
 
 
 ---
 
-## 9. Recommended Extensions
+## 9. Future Work
 
-- Add SQL few-shot examples  
-- Add logging of SQL and questions  
-- Cloud deployment  
+- **Offline LLM & Rate Limit Handling**  
+  Currently, the system depends on the online Groq LLM. If the API is unreachable or rate-limited, `LLMFallbackManager` provides a safe placeholder SQL. Future work could explore lightweight local models or caching strategies.
+
+- **Query History & Context-Aware Refinement**  
+  Store user query history to refine follow-up queries and improve context-aware SQL generation.
+
+- **Multi-Provider LLM Support**  
+  Integrate multiple LLM providers for automatic failover and increased reliability.
+
+- **Extended Visualizations & Analytics**  
+  Add more chart types and customizable dashboards for richer insights.
+
