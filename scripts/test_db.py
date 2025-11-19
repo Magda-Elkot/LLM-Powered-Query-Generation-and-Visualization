@@ -42,7 +42,7 @@ def main():
 
     # Execute sample SELECT queries for first 2 tables
     for table in table_names[:2]:
-        sql = f"SELECT * FROM {table} LIMIT 5;"
+        sql = f"SELECT * FROM {table} LIMIT 5"
         df = executor.execute(sql)
         print(f"\nSample data from {table}:")
         if not df.empty:
@@ -52,7 +52,8 @@ def main():
 
     # Execute a scalar query for a count
     first_table = table_names[0]
-    count_sql = f"SELECT COUNT(*) FROM {first_table};"
+    count_sql = f"SELECT COUNT(*) FROM {first_table}"
+
     count = executor.execute_scalar(count_sql)
     print(f"\nRow count in {first_table}: {count}")
 
